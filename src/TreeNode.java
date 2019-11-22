@@ -55,6 +55,7 @@ public class TreeNode {
 		children.add(x);
 	}
 	
+		
 	//add specific for adding in an already populated node
 	public void addChild(int x, int i)
 	{
