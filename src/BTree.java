@@ -1,44 +1,62 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.RandomAccessFile;
 
 public class BTree extends TreeNode {
 	//we need to create instructor with the max degree
 	int degree;
 	TreeNode root;
-	public <T> Object search(TreeNode target, long x)
-	{
-		TreeObject treeO = new TreeObject(x);
-		int i = 1;
-		while(i<target.getN() && treeO.equals(target.getKey(i)) > 0)
-		{
-			i++;
-		}
-		if(i<target.getN() && treeO.equals(target.getKey(i)) == 0)
-		{
-			return target.getKey(i);
-		}
-		if(target.leaf())
-		{
-			return null;
-			
-		}
-		else
-		{
-		int childOffset = target.getChild(i);
-		}
-		return search(,x);
-	}
-	public void insertNonFull(TreeNode x, long k)
-	{
-		int i = x.getN();
-		TreeObject treeO = new TreeObject(k);
-		if(x.leaf())
-		{
-			while(i>0 && treeO.equals(x.getKey(i-1)) < 0)
-			{
-				i--;
-			}
-		}
-	}
+	int cursor;
+	int TreeNodeSize;
+	private RandomAccessFile file;
 	
+	
+	public BTree(int seqLength,int degree) {
+		try {
+			file=new RandomAccessFile(new File("Test_result"), "rw");
+			cursor=0;
+			this.disk_write(root, root.getLocation());
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+//	public <T> Object search(TreeNode target, long x)
+//	{
+//		TreeObject treeO = new TreeObject(x);
+//		int i = 1;
+//		while(i<target.getN() && treeO.equals(target.getKey(i)) > 0)
+//		{
+//			i++;
+//		}
+//		if(i<target.getN() && treeO.equals(target.getKey(i)) == 0)
+//		{
+//			return target.getKey(i);
+//		}
+//		if(target.leaf())
+//		{
+//			return null;
+//			
+//		}
+//		else
+//		{
+//		int childOffset = target.getChild(i);
+//		}
+//		return search(,x);
+//	}
+//	public void insertNonFull(TreeNode x, long k)
+//	{
+//		int i = x.getN();
+//		TreeObject treeO = new TreeObject(k);
+//		if(x.leaf())
+//		{
+//			while(i>0 && treeO.equals(x.getKey(i-1)) < 0)
+//			{
+//				i--;
+//			}
+//		}
+//	}
+//	
 	/*
 	 * the child node =x in the pseudo code
 	 * the parent node = y in the pseudo code
@@ -100,9 +118,9 @@ public class BTree extends TreeNode {
 			s.setN(0);
 			s.addChild(r.getLocation());
 			this.split(s, 0, r);
-			this.insertNonFull(s, k);
+		//	this.insertNonFull(s, k);
 		}else {
-			this.insertNonFull(r, k);
+			//this.insertNonFull(r, k);
 		}
 		
 	}
@@ -111,15 +129,34 @@ public class BTree extends TreeNode {
 	
 	public void disk_write(TreeNode node, int offset){
 		
+		try{			
 		
+			
+			/**
+			 * write MetaData is going to be in the sequece of the
+			 * 
+			 * 		WriteBoolean
+			 * 		WriteInt number of keys
+			 * 		WrriteInt the location
+			 */
+			file.writeBoolean(node.leaf());
+			file.writeInt(node.getN());
+			file.writeInt(node.getLocation());
+			for (int i = 0; i < node.getN(); i++)
+			{
+					file.writeLong(node.getKey(i).getLongValue());
+					file.writeInt(node.getKey(i).getFrequency());
+					file.writeInt(node.getChild(i));
+			}			
+				file.writeInt(node.getChild(node.getN()+1));
+		} 
+		catch (Exception e) {
+			System.out.println("Error in writing ");
+			e.printStackTrace();
+		}
 		
 	}
-	
-	
-	
-	
-	
-	
+
 	
 	
 	
