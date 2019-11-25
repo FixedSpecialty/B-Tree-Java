@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.LinkedList;
 
 public class BTree extends TreeNode {
 	//we need to create instructor with the max degree
@@ -9,18 +11,29 @@ public class BTree extends TreeNode {
 	int cursor;
 	int TreeNodeSize;
 	private RandomAccessFile file;
+<<<<<<< HEAD
 
 
 	public BTree(int seqLength,int degree) {
+=======
+	private int maxNodeSize;
+	
+	
+	public BTree(String filename,int seqLength,int degree) {
+>>>>>>> dc079353bb964884856517a6ade10a0e96b87534
 		try {
-			file=new RandomAccessFile(new File("Test_result"), "rw");
+			file=new RandomAccessFile(new File(filename), "rw");
 			cursor=0;
+			root=new TreeNode();
+			this.maxNodeSize=12*(2*degree-1)+4*(2*degree+1)+9;
 			this.disk_write(root, root.getLocation());
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+<<<<<<< HEAD
 	//	public <T> Object search(TreeNode target, long x)
 	//	{
 	//		TreeObject treeO = new TreeObject(x);
@@ -102,6 +115,9 @@ public class BTree extends TreeNode {
 		insertNonFull(C[x], long k);
 	}
 
+=======
+	
+>>>>>>> dc079353bb964884856517a6ade10a0e96b87534
 	/*
 	 * the child node =x in the pseudo code
 	 * the parent node = y in the pseudo code
@@ -121,23 +137,27 @@ public class BTree extends TreeNode {
 				//it is either degree or i
 				z.addChild(y.removeChild(i));
 			}
+<<<<<<< HEAD
 
+=======
+>>>>>>> dc079353bb964884856517a6ade10a0e96b87534
 		}
-		//examine this case for the root
+
 		x.addKey(y.removeKey(degree-1), index);
 		x.setN(x.getN()+1);
 		y.setN(y.getN()-1);
 
 		//write to the disk
 		if(x==root && x.getN()==1) {
-			//disk_write(y,Location);
-			//Location+=Sizeof TreeNode;
-			//z.setLocation(Location);
-			//x.addChild(z.getLoaction, i+1)
-			//disk_write(z,Location);
-			//disk_write(x,rootOffSet);
-			//Location+=TreeNodesize
+			disk_write(y,cursor);
+			cursor+=this.maxNodeSize;
+			z.setLocation(cursor);
+			x.addChild(z.getLocation());
+			disk_write(z,cursor);
+			disk_write(x,0);
+			cursor+=this.maxNodeSize;
 		}else {
+<<<<<<< HEAD
 			//disk_write(y,y.getLocation);
 			//z.setLocation(Location(offSet));
 			//disk_write(z,Location);
@@ -145,13 +165,24 @@ public class BTree extends TreeNode {
 			//disk_write(x,x.getLocation);
 			//Location+=sizeof TreeNode
 
+=======
+			disk_write(y,y.getLocation());
+			z.setLocation(cursor);
+			disk_write(z,z.getLocation());
+			x.addChild(z.getLocation(), index+1);
+			disk_write(x,x.getLocation());
+			cursor+=this.maxNodeSize;
+			
+>>>>>>> dc079353bb964884856517a6ade10a0e96b87534
 		}
 
 
 	}
 	public void Insert(long k) {
 		TreeNode r=this.root;
+		
 		if(r.getN()==(2*degree-1)) {
+			
 			//handle duplicates
 			//call serchMethod and if the returns are equal then increase the numofDup
 			//we need TreeNode constructor with Long
@@ -161,16 +192,27 @@ public class BTree extends TreeNode {
 			this.root=s;
 			s.setLeaf(false);
 			s.setN(0);
+			s.setLocation(cursor);
+			cursor+=this.maxNodeSize;
 			s.addChild(r.getLocation());
 			this.split(s, 0, r);
+<<<<<<< HEAD
 			//	this.insertNonFull(s, k);
+=======
+			this.insertNonFull(s, k);
+>>>>>>> dc079353bb964884856517a6ade10a0e96b87534
 		}else {
-			//this.insertNonFull(r, k);
+			this.insertNonFull(r, k);
 		}
 
 	}
+<<<<<<< HEAD
 	public void readNode(int i)
 	{
+=======
+
+	public void disk_write(TreeNode node, int offset){
+>>>>>>> dc079353bb964884856517a6ade10a0e96b87534
 		
 	}
 
@@ -179,8 +221,11 @@ public class BTree extends TreeNode {
 	{
 
 		try{			
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> dc079353bb964884856517a6ade10a0e96b87534
 			/**
 			 * write MetaData is going to be in the sequece of the
 			 * 
@@ -188,14 +233,22 @@ public class BTree extends TreeNode {
 			 * 		WriteInt number of keys
 			 * 		WrriteInt the location
 			 */
+			file.seek(offset);
 			file.writeBoolean(node.leaf());
 			file.writeInt(node.getN());
-			file.writeInt(node.getLocation());
+			file.writeInt(node.getParent());
 			for (int i = 0; i < node.getN(); i++)
 			{
+<<<<<<< HEAD
 				file.writeLong(node.getKey(i).getLongValue());
 				file.writeInt(node.getKey(i).getFrequency());
 				file.writeInt(node.getChild(i));
+=======
+					file.writeInt(node.getChild(i));
+					file.writeLong(node.getKey(i).getLongValue());
+					file.writeInt(node.getKey(i).getFrequency());
+					
+>>>>>>> dc079353bb964884856517a6ade10a0e96b87534
 			}			
 			file.writeInt(node.getChild(node.getN()+1));
 		} 
@@ -205,6 +258,34 @@ public class BTree extends TreeNode {
 		}
 
 	}
+	/**
+	 * 
+	 * @param location of the node in the file, we Do not have TreeMetaData
+	 */
+	public TreeNode readFile(int location){
+		//should return TreeNode
+		TreeNode node=new TreeNode();
+		try {
+			file.seek(location);
+			node.setLeaf(file.readBoolean());
+			node.setN(file.readInt());
+			node.setParent(file.readInt());
+			for(int i=0;i<(2*degree)-1;i++) {
+				node.addChild(file.readInt());
+				TreeObject obj=new TreeObject(file.readLong(),file.readInt());
+			
+				node.addKey(obj);
+				
+			}
+			return node;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+		
+
+<<<<<<< HEAD
 
 
 
@@ -216,5 +297,21 @@ public class BTree extends TreeNode {
 
 
 
-
+=======
+	
+	
+	
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+>>>>>>> dc079353bb964884856517a6ade10a0e96b87534
 }
