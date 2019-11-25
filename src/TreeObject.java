@@ -1,14 +1,14 @@
 public class TreeObject {
-	private String dnaString;
+	private long dnaLongValue;
 	private int frequency;
 
-	public TreeObject(String dnaString) {
-		this.dnaString = dnaString;
-		this.frequency = 1;
+	public TreeObject(long dnaLongValue,int freq) {
+		this.dnaLongValue = dnaLongValue;
+		this.frequency = freq;
 	}
 
 	public long getLongValue(){
-		return DataConversion.convertToLong(dnaString);
+		return dnaLongValue;
 	}
 
 	public int getFrequency(){
@@ -19,14 +19,14 @@ public class TreeObject {
 		frequency++;
 	}
 
-	public String getDnaString()
-	{
-		return this.dnaString;
-	}
+//	public String getDnaString()
+//	{
+//		return DataConversion.convertFromLong(dnaLongValue, length);
+//	}
 
 	@Override
 	public String toString() {
-		return "Frequency: " + frequency + ", Sequence: " + dnaString;
+		return "Frequency: " + frequency + ", Sequence: " + dnaLongValue;
 	}
 }
 

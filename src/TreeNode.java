@@ -15,8 +15,9 @@ public class TreeNode {
 	
 	public TreeNode()
 	{
-		parent = -1;
 		n = 0;
+		leaf=false;
+		ownLocation=0;
 		keys = new LinkedList<TreeObject>();
 		children = new LinkedList<Integer>();
 		
