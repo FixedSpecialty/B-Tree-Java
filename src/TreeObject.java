@@ -2,8 +2,8 @@ public class TreeObject {
 	private String dnaString;
 	private int frequency;
 
-	public TreeObject(String dnaString) {
-		this.dnaString = dnaString;
+	public TreeObject(long k) {
+		this.dnaString = k;
 		this.frequency = 1;
 	}
 

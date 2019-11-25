@@ -98,7 +98,7 @@ public class TreeNode {
 		keys.add(i, x);
 	}
 	
-	//returns the index if the key 
+	//returns the index of the key 
 	public TreeObject getKey(int i)
 	{
 		return keys.get(i);
