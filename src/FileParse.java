@@ -8,9 +8,12 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import static java.lang.Character.isDigit;
+
+//if returns 0 then increment offset again when called
 public class FileParse {
     private static boolean neededData;
     public static LinkedList<String> fileParse(int seqLength, File file) throws FileNotFoundException {
+        LinkedList<Character> holdLastFew = new LinkedList<>();
         String str = "";
         LinkedList<String> linky = new LinkedList<>();
         Scanner s = new Scanner(file);
@@ -31,9 +34,16 @@ public class FileParse {
                         temp.addLast(next.charAt(i));
                     }
                 }
+                for(int insertPrevLine = 0; insertPrevLine < holdLastFew.size(); insertPrevLine++){
+                    temp.addFirst(holdLastFew.get(insertPrevLine));
+                }
+                holdLastFew.clear();
+                for(int addLastFew = 0; addLastFew < seqLength-1; addLastFew++){
+                    holdLastFew.add(temp.get(temp.size()-addLastFew-1));
+                }
                 for(int i = 0; i <= temp.size()-seqLength; i++){
                     for(int j = i; j < seqLength+i; j++){
-                            str+=temp.get(j);
+                        str+=temp.get(j);
                     }
                     if(str.contains("N")){
                         linky.addLast(" ");
