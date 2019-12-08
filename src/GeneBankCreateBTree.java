@@ -91,7 +91,6 @@ public class GeneBankCreateBTree {
 			
 		}		
 		bTree.print(bTree.root, 1);
-		bTree.root.print();
 	}catch(Exception e)
 	{
 		usage();

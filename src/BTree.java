@@ -18,12 +18,18 @@ public class BTree {
 	boolean cacheBoolean;
 	int cacheSize;
 	int debugLevel;
+	Cache cache;
 	public int size=0;
 	int sequencelength;
 	BufferedWriter writer;
 	StringBuilder StringtoWrite=new StringBuilder();
 	public BTree(String filename,int seqLength,int t, boolean cacheBoolean, int cacheSize, int debugLevel) {
 		try {
+			if(cacheBoolean == false) {
+				this.cache = new Cache(0);
+			} else {
+				this.cache = new Cache(cacheSize);
+			}
 			printName = filename;
 			this.degree=t;
 			sequencelength=seqLength;
@@ -41,6 +47,11 @@ public class BTree {
 	}
 	public BTree(File filename,int seqLength,int t, boolean cacheBoolean, int cacheSize, int debugLevel) {
 		try {
+			if(cacheBoolean == false) {
+				this.cache = new Cache(0);
+			} else {
+				this.cache = new Cache(cacheSize);
+			}
 			this.degree=t;
 			sequencelength=seqLength;
 			this.filename = filename;
@@ -167,8 +178,7 @@ public class BTree {
 		
 		
 	}
-	public void disk_write(TreeNode node, long position)
-	{
+	public void disk_write(TreeNode node, long position) {
 		try {
 			RandomAccessFile writtingfile=new RandomAccessFile(filename,"rw");
 			writtingfile.seek(position);
@@ -183,7 +193,10 @@ public class BTree {
 			for(int i=0;i<node.children.length;i++) {
 				writtingfile.writeLong(node.children[i]);
 				}
-			
+
+
+			cache.addObject(node);
+
 			writtingfile.close();
 			
 		} catch (IOException e) {
@@ -200,12 +213,18 @@ public class BTree {
 		public TreeNode readFile(Long location){
 			//should return TreeNode
 			TreeNode node=new TreeNode(degree,location);
+			for(int i = 0; i < cacheSize; i++){
+				TreeNode n = (TreeNode)cache.get(i);
+				if(location == n.ownLocation){
+					return n;
+				}
+			}
 			try {
 				RandomAccessFile qfile=new RandomAccessFile(this.filename,"r");
 				qfile.seek(location);
 				node.leaf=qfile.readBoolean();
 				node.n=qfile.readInt();
-				System.out.println(node.n);
+				//System.out.println(node.n);
 				node.ownLocation=qfile.readLong();
 				for(int i=0;i<node.keys.length;i++) {
 					
@@ -226,7 +245,6 @@ public class BTree {
 		
 		
 	public TreeNode search(TreeNode node, long key) {
-			
 			int i =0;
 			TreeNode returnNode=null;
 			

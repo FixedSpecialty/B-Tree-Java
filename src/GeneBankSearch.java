@@ -13,57 +13,13 @@ public class GeneBankSearch {
     private static int cacheSize;
     private static int debugLevel;
     private static int degree;
+    public static Cache actualCache;
 
     public static void usage() 
 	{
 		
 		System.out.println("java GeneBankSearch <0/1(no/with Cache)> <btree file> <query file> [<cache size>]\n" + 
 				"[<debug level>]");
-		
-	}
-    private static TreeNode Read(long location) {
-		TreeNode node=new TreeNode(degree,location);
-		try {
-			RandomAccessFile qfile=new RandomAccessFile(new File(treeFile),"rwd");
-			qfile.seek(location);
-			node.leaf=qfile.readBoolean();
-			node.n=qfile.readInt();
-			node.ownLocation=qfile.readLong();
-			for(int i=0;i<node.keys.length;i++) {
-				
-				long val=qfile.readLong();
-				int freq=qfile.readInt();
-				node.keys[i]=new TreeObject(val,freq);
-			}
-			for(int i=0;i<node.children.length;i++) {
-				node.children[i]=qfile.readLong();
-			}
-			qfile.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return node;
-    }
-	public static TreeNode search(TreeNode node, long key) {
-		
-		int i =0;
-		TreeNode returnNode=null;
-		
-		while(i< node.n && key>node.keys[i].getLongValue()){
-			i++;
-		}
-		if (i<node.n && key == node.keys[i].getLongValue()) {
-			return node;
-		}
-		if(node.leaf) {
-			return null;
-		}
-		if(node.children[i]!=-1) {
-			returnNode=GeneBankSearch.Read(node.children[i]);
-		}
-		return GeneBankSearch.search(returnNode,key);
-		
 		
 	}
     public static void main(String[] args) throws IOException
@@ -95,6 +51,7 @@ public class GeneBankSearch {
         if(args.length > 3 && args.length < 5)
         {
             cacheSize = Integer.parseInt(args[3]);
+            actualCache = new Cache(cacheSize);
         }
         //args 4 check
         if(args.length == 5 && !cacheBool)
@@ -143,4 +100,48 @@ public class GeneBankSearch {
         t.printStackTrace();
     }
     }
+	private static TreeNode Read(long location) {
+		TreeNode node=new TreeNode(degree,location);
+		try {
+			RandomAccessFile qfile=new RandomAccessFile(new File(treeFile),"rwd");
+			qfile.seek(location);
+			node.leaf=qfile.readBoolean();
+			node.n=qfile.readInt();
+			node.ownLocation=qfile.readLong();
+			for(int i=0;i<node.keys.length;i++) {
+
+				long val=qfile.readLong();
+				int freq=qfile.readInt();
+				node.keys[i]=new TreeObject(val,freq);
+			}
+			for(int i=0;i<node.children.length;i++) {
+				node.children[i]=qfile.readLong();
+			}
+			qfile.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return node;
+	}
+	public static TreeNode search(TreeNode node, long key) {
+		int i =0;
+		TreeNode returnNode=null;
+
+		while(i< node.n && key>node.keys[i].getLongValue()){
+			i++;
+		}
+		if (i<node.n && key == node.keys[i].getLongValue()) {
+			return node;
+		}
+		if(node.leaf) {
+			return null;
+		}
+		if(node.children[i]!=-1) {
+			returnNode=GeneBankSearch.Read(node.children[i]);
+		}
+		return GeneBankSearch.search(returnNode,key);
+
+
+	}
 }
