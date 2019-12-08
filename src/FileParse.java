@@ -5,8 +5,6 @@ import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.Scanner;
 import static java.lang.Character.isDigit;
-
-//if returns 0 then increment offset again when called
 public class FileParse {
     private static boolean neededData;
     public static LinkedList<String> fileParse(int seqLength, File file) throws FileNotFoundException {
