@@ -26,7 +26,7 @@ public class GeneBankCreateBTree {
 
 	private static int optimalDegree() {
 		double optimalDegree;
-		int metaData = 9;
+		int metaData = 13;
 		int pointers = 4;
 		int objects = 12;
 		double diskSize = 4096;
@@ -91,7 +91,7 @@ public class GeneBankCreateBTree {
 			
 		}		
 		bTree.print(bTree.root, 1);
-		System.out.println(bTree.size);	
+		bTree.root.print();
 	}catch(Exception e)
 	{
 		usage();

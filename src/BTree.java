@@ -47,7 +47,6 @@ public class BTree {
 			this.cacheBoolean = cacheBoolean;
 			this.cacheSize = cacheSize;
 			this.debugLevel = debugLevel;
-			root=new TreeNode(t,0);
 			
 		}catch(Exception e) {
 			e.printStackTrace();
