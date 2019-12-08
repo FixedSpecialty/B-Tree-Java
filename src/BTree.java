@@ -1,278 +1,307 @@
+
+
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.LinkedList;
 
-public class BTree extends TreeNode {
+public class BTree {
 	//we need to create instructor with the max degree
 	int degree;
-	TreeNode root;
-	int cursor;
+	public TreeNode root;
 	int TreeNodeSize;
-	private RandomAccessFile file;
-	private int maxNodeSize;
-
-
-	public BTree(String filename,int seqLength,int degree, boolean cacheUse) {
+	File filename;
+	String printName;
+	boolean cacheBoolean;
+	int cacheSize;
+	int debugLevel;
+	public int size=0;
+	int sequencelength;
+	BufferedWriter writer;
+	StringBuilder StringtoWrite=new StringBuilder();
+	public BTree(String filename,int seqLength,int t, boolean cacheBoolean, int cacheSize, int debugLevel) {
 		try {
-			file=new RandomAccessFile(new File(filename), "rw");
-			cursor=0;
-			root=new TreeNode();
-			this.maxNodeSize=12*(2*degree-1)+4*(2*degree+1)+9;
-			this.disk_write(root, root.getLocation());
-
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			printName = filename;
+			this.degree=t;
+			sequencelength=seqLength;
+			this.filename=new File(filename);
+			this.cacheBoolean = cacheBoolean;
+			this.cacheSize = cacheSize;
+			this.debugLevel = debugLevel;
+			root=new TreeNode(t,0);
+			this.disk_write(root, root.ownLocation);
+		
+			
+		}catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
-	//<<<<<<< HEAD
-	//	public <T> Object search(TreeNode target, long x)
-	//	{
-	//		TreeObject treeO = new TreeObject(x);
-	//		int i = 1;
-	//		while(i<target.getN() && treeO.equals(target.getKey(i)) > 0)
-	//		{
-	//			i++;
-	//		}
-	//		if(i<target.getN() && treeO.equals(target.getKey(i)) == 0)
-	//		{
-	//			return target.getKey(i);
-	//		}
-	//		if(target.leaf())
-	//		{
-	//			return null;
-	//			
-	//		}
-	//		else
-	//		{
-	//		int childOffset = target.getChild(i);
-	//		}
-	//		return search(,x);
-	//	}
-
-
-	//	search backwards rather than forwards
-	//	i=n[x]
-	//	if leaf[x] //can insert new key
-	//	     then while i>=1 and k<keyi[x] // keep searching until you find the bigger key
-	//	               do keyi+1[x] = keyi[x]
-	//	                i--;
-	//	       keyi+1[x]=k
-	//	       h[x]++
-	//	       disk-write(x);
-	//	else //if not a leaf node
-	//	    while i>=1 and k<keyi[x]
-	//	       do i--;
-	//	  i++;
-	//	disk-read(Ci[x]);
-	//	if n[Ci[x] = 2t-1
-	//	     then BTree_split-child(x,i,Ci[x]);
-	//	         if k>keyi[x]
-	//	            then i++;
-	//	BTree-insert-nonfull(Ci[x], k);
-
-	public void insertNonFull(TreeNode x, long k)
-	{
-		int i = x.getN();
-		TreeObject treeO = new TreeObject(k);
-		if(x.leaf() && x.getN()!=0)
-		{
-			while(i>0 && (treeO.compareTo(x.getKey(i)))<0)
-			{
-
-				i--;
-			}
-			if(i>0 && (treeO.compareTo(x.getKey(i)))==0)
-			{
-				x.getKey(i).incrementFrequency();
-			}
-			else {
-				x.addKey(treeO, i);
-				x.setN(x.getN()+1);
-			}
-			disk_write(x,x.getLocation());
+	public BTree(File filename,int seqLength,int t, boolean cacheBoolean, int cacheSize, int debugLevel) {
+		try {
+			this.degree=t;
+			sequencelength=seqLength;
+			this.filename = filename;
+			this.cacheBoolean = cacheBoolean;
+			this.cacheSize = cacheSize;
+			this.debugLevel = debugLevel;
+			root=new TreeNode(t,0);
+			
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
-		else
-		{
-			while(i>0 && (treeO.compareTo(x.getKey(i)))<0)
-			{
-
-				i--;
-			}
-			if(i>0 && (treeO.compareTo(x.getKey(i)))==0)
-			{
-				x.getKey(i).incrementFrequency();
-				disk_write(x,x.getLocation());
-			}
-
-			TreeNode y = readFile(x.getChild(i));
-
-			if(y.getN() == ((2*(degree)-1)))
-			{
-				int z = y.getN();
-				while(z>0 && (treeO.compareTo(y.getKey(i))) < 0)
-				{
-					z--;
+	}
+	public TreeNode getRoot()
+	{
+		return root;
+	}
+	public void insert(long k) {
+		this.size++;
+		TreeNode checkduplicate=this.search(root, k);
+		if(checkduplicate!=null) {
+			for(int i=0;i<checkduplicate.keys.length;i++) {
+				if(checkduplicate.keys[i].getLongValue()==k) {
+					checkduplicate.keys[i].incrementFrequency();
+					this.disk_write(checkduplicate, checkduplicate.ownLocation);
+					return;
 				}
-				if(z>0 && (treeO.compareTo(y.getKey(i)))==0)
-				{
-					y.getKey(i).incrementFrequency();
-					disk_write(y,y.getLocation());
+			}
+		}
+		TreeNode r=this.root;
+		if(r.n==(2*this.degree-1)) {
+			TreeNode s=new TreeNode(this.degree,this.getFileLength());
+			this.disk_write(s, s.ownLocation);
+			this.root.ownLocation=this.getFileLength();
+			this.disk_write(root, root.ownLocation);
+			this.root=s;
+			s.leaf=false;
+			s.n=0;
+			s.children[0]=r.ownLocation;
+			s.ownLocation=0;
+			this.split(s, 0, r);
+			this.insertNonFull(s, k);
+		
+		}else {
+			this.insertNonFull(root, k);
+		}
+	}
+	
+	
+
+	public void insertNonFull(TreeNode x, long k) {
+
+		 int i=x.n-1;
+		 if(x.leaf) {
+			 while(i>=0 && k<x.keys[i].getLongValue()) {
+				 x.keys[i+1]=new TreeObject(x.keys[i].getLongValue(),x.keys[i].getFrequency());
+				 i--;
+			 }
+			 x.keys[i+1]=new TreeObject(k);
+			 x.n++;
+			 this.disk_write(x, x.ownLocation);
+			 
+		 }else {
+			 while(i>=0 && k < x.keys[i].getLongValue()) {
+				 i--;
+			 }
+			 i++;
+			 TreeNode node;
+			 if(x.children[i]!=-1) {
+				 node=this.readFile(x.children[i]);
+				 if(node.n==(2*this.degree-1)) {
+					 this.split(x, i, node);
+					 if(k>x.keys[i].getLongValue()) {
+						 i++;
+					 }
+
+				 }
+				
+				 this.insertNonFull(this.readFile(x.children[i]),k);
+				 
+			 }
+
+
+		 }
+	}
+	public void split(TreeNode x, int i, TreeNode y) {
+		TreeNode z=new TreeNode(this.degree,this.getFileLength());
+		x.children[i]=y.ownLocation;
+		z.leaf=y.leaf;
+		z.n=this.degree-1;
+		this.disk_write(z, z.ownLocation);
+		
+		
+		for(int j=0;j<this.degree-1;j++) {
+			z.keys[j]=new TreeObject(y.keys[j+this.degree].getLongValue(),y.keys[j+this.degree].getFrequency());	
+			y.keys[j+this.degree]= new TreeObject();
+		}
+		if(!y.leaf) {
+			for(int j=0;j<this.degree;j++) {
+				z.children[j]=y.children[j+this.degree];
+				y.children[j+this.degree]=-1;
+			}
+		}
+		
+		
+		y.n=this.degree-1;
+		for(int j=x.n;j>i;j--) {
+			x.children[j+1]=x.children[j];
+			x.children[j]=-1;
+			
+		}
+		x.children[i+1]=z.ownLocation;
+		for(int j=x.n-1;j>(i-1);j--) {
+			x.keys[j+1]=new TreeObject(x.keys[j].getLongValue(),x.keys[j].getFrequency());
+			
+		}
+		
+		x.keys[i]=new TreeObject(y.keys[this.degree-1].getLongValue(),y.keys[this.degree-1].getFrequency());
+		y.keys[this.degree-1]=new TreeObject();
+		x.n++;
+		
+
+		this.disk_write(z, z.ownLocation);
+		this.disk_write(y, y.ownLocation);
+		this.disk_write(x, x.ownLocation);
+		
+		
+	}
+	public void disk_write(TreeNode node, long position)
+	{
+		try {
+			RandomAccessFile writtingfile=new RandomAccessFile(filename,"rw");
+			writtingfile.seek(position);
+			writtingfile.writeBoolean(node.leaf);
+			writtingfile.writeInt(node.n);
+			writtingfile.writeLong(node.ownLocation);
+			for(int i=0;i<node.keys.length;i++) {
+				writtingfile.writeLong(node.keys[i].getLongValue());
+				writtingfile.writeInt(node.keys[i].getFrequency());
 				}
-				else
-				{
-					split(x,i,y);
-					if(k>x.getKey(i).getLongValue())
-					{
-						i++;
+			
+			for(int i=0;i<node.children.length;i++) {
+				writtingfile.writeLong(node.children[i]);
+				}
+			
+			writtingfile.close();
+			
+		} catch (IOException e) {
+				e.printStackTrace();
+				}
+				
+				
+		
+		}
+		/**
+		 * 
+		 * @param location of the node in the file, we Do not have TreeMetaData
+		 */
+		public TreeNode readFile(Long location){
+			//should return TreeNode
+			TreeNode node=new TreeNode(degree,location);
+			try {
+				RandomAccessFile qfile=new RandomAccessFile(this.filename,"r");
+				qfile.seek(location);
+				node.leaf=qfile.readBoolean();
+				node.n=qfile.readInt();
+				System.out.println(node.n);
+				node.ownLocation=qfile.readLong();
+				for(int i=0;i<node.keys.length;i++) {
+					
+					long val=qfile.readLong();
+					int freq=qfile.readInt();
+					node.keys[i]=new TreeObject(val,freq);
+				}
+				for(int i=0;i<node.children.length;i++) {
+					node.children[i]=qfile.readLong();
+				}
+				qfile.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return node;
+		}
+		
+		
+	public TreeNode search(TreeNode node, long key) {
+			
+			int i =0;
+			TreeNode returnNode=null;
+			
+			while(i< node.n && key>node.keys[i].getLongValue()){
+				i++;
+			}
+			if (i<node.n && key == node.keys[i].getLongValue()) {
+				return node;
+			}
+			if(node.leaf) {
+				return null;
+			}
+			if(node.children[i]!=-1) {
+				returnNode=this.readFile(node.children[i]);
+			}
+			return search(returnNode,key);
+			
+			
+		}
+
+		public long getFileLength() {
+			long x = 0;
+			try {
+				RandomAccessFile newfile=new RandomAccessFile(this.filename,"r");
+				x= newfile.length();
+				newfile.close();
+			}catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return x;
+
+		}
+		
+	public void print(TreeNode node, int debug) throws IOException {
+		
+			
+			int i;
+			for(i=0; i < 2*this.degree-1; i++) {
+				if (!node.leaf) {
+					if(node.children[i] != -1L) {
+						TreeNode n = readFile(node.children[i]);
+						print(n, debug);
+					}
+				}
+				TreeObject current = node.keys[i];
+				if(current.getLongValue() != -1) {
+					System.out.print(DataConversion.convertFromLong(current.getLongValue(), this.sequencelength)+": "+current.getFrequency()+"\n");
+					if(debug == 1) {
+						StringtoWrite.append(DataConversion.convertFromLong(current.getLongValue(), this.sequencelength)+": "+current.getFrequency()+"\n");
 					}
 				}
 			}
-		}
-		TreeNode y = readFile(x.getChild(i));
-		insertNonFull(y, k);
-	}
-
-	/*
-	 * the child node =x in the pseudo code
-	 * the parent node = y in the pseudo code
-	 */
-	public void split(TreeNode x, int index, TreeNode y){
-
-		TreeNode z=new TreeNode();
-		z.setLeaf(y.leaf());
-		z.setParent(y.getParent());
-		for(int i=0;i<degree-1;i++) {
-			z.addKey(y.removeKey(i));
-			z.setN(z.getN()+1);
-			y.setN(y.getN()-1);
-		}
-		if(!y.leaf()) {
-			for(int i=0;i<degree-1;i++) {
-				//it is either degree or i
-				z.addChild(y.removeChild(i));
+			
+			if (!node.leaf) {
+				if(node.children[i] != -1L) {
+					TreeNode n = this.readFile(node.children[i]);
+					print(n, debug);
+				}
 			}
-		}
-
-		x.addKey(y.removeKey(degree-1), index);
-		x.setN(x.getN()+1);
-		y.setN(y.getN()-1);
-
-		//write to the disk
-		if(x==root && x.getN()==1) {
-			disk_write(y,cursor);
-			cursor+=this.maxNodeSize;
-			z.setLocation(cursor);
-			x.addChild(z.getLocation());
-			disk_write(z,cursor);
-			disk_write(x,0);
-			cursor+=this.maxNodeSize;
-		}else {
-
-			//disk_write(y,y.getLocation);
-			//z.setLocation(Location(offSet));
-			//disk_write(z,Location);
-			//x.addChild(z.getLocation, index+1);
-			//disk_write(x,x.getLocation);
-			//Location+=sizeof TreeNode
-
-			disk_write(y,y.getLocation());
-			z.setLocation(cursor);
-			disk_write(z,z.getLocation());
-			x.addChild(z.getLocation(), index+1);
-			disk_write(x,x.getLocation());
-			cursor+=this.maxNodeSize;
-		}
+			
+			//	Close writer
+			String[] parts = printName.split("\\.");
+			String file = parts[0];
+			String btree = parts[1];
+			String data = parts[2];
+			String sequence = parts[3];
+			String degree = parts[4];
+			
+			writer = new  BufferedWriter(new FileWriter(file+"."+btree+"."+"dump."+sequence+"."+degree));
+			writer.write(StringtoWrite.toString());
+			writer.close();
 
 
-	}
-	public void Insert(long k) {
-		TreeNode r=this.root;
-
-		if(r.getN()==(2*degree-1)) {
-
-			//handle duplicates
-			//call serchMethod and if the returns are equal then increase the numofDup
-			//we need TreeNode constructor with Long
-			//TreeNode s=new TreeNode(k);
-			TreeNode s=new TreeNode();
-
-			this.root=s;
-			s.setLeaf(false);
-			s.setN(0);
-			s.setLocation(cursor);
-			cursor+=this.maxNodeSize;
-			s.addChild(r.getLocation());
-			this.split(s, 0, r);
-			this.insertNonFull(s, k);
-
-		}else {
-			this.insertNonFull(r, k);
 		}
 
 	}
-
-	public void disk_write(TreeNode node, int offset)
-	{
-
-		try{			
-			/**
-			 * write MetaData is going to be in the sequece of the
-			 * 
-			 * 		WriteBoolean
-			 * 		WriteInt number of keys
-			 * 		WrriteInt the location
-			 */
-			file.seek(offset);
-			file.writeBoolean(node.leaf());
-			file.writeInt(node.getN());
-			file.writeInt(node.getParent());
-			for (int i = 0; i < node.getN(); i++)
-			{
-//				//<<<<<< HEAD
-//				file.writeLong(node.getKey(i).getLongValue());
-//				file.writeInt(node.getKey(i).getFrequency());
-//				file.writeInt(node.getChild(i));
-//				//=======
-				file.writeInt(node.getChild(i));
-				file.writeLong(node.getKey(i).getLongValue());
-				file.writeInt(node.getKey(i).getFrequency());
-
-			}			
-			file.writeInt(node.getChild(node.getN()+1));
-		} 
-		catch (Exception e) {
-			System.out.println("Error in writing ");
-			e.printStackTrace();
-		}
-	}
-	/**
-	 * 
-	 * @param location of the node in the file, we Do not have TreeMetaData
-	 */
-	public TreeNode readFile(int location){
-		//should return TreeNode
-		TreeNode node=new TreeNode();
-		try {
-			file.seek(location);
-			node.setLeaf(file.readBoolean());
-			node.setN(file.readInt());
-			node.setParent(file.readInt());
-			for(int i=0;i<(2*degree)-1;i++) {
-				node.addChild(file.readInt());
-				TreeObject obj=new TreeObject(file.readLong(),file.readInt());
-
-				node.addKey(obj);
-
-			}
-			return node;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-}

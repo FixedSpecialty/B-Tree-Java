@@ -1,18 +1,28 @@
-public class TreeObject implements Comparable<TreeObject>{
+
+public class TreeObject implements Comparable<TreeObject> {
 	private long dnaLongValue;
 	private int frequency;
 
-//<<<<<<< HEAD
-	public TreeObject(long k) {
-		this.dnaLongValue = k;
+	public TreeObject() {
+		this.dnaLongValue = -1L;
 		this.frequency = 1;
-//=======
+	}
+
+
+	public TreeObject(long dnaLongValue) {
+		this.dnaLongValue = dnaLongValue;
+		this.frequency =1;
+	
+	}	
+	
 	public TreeObject(long dnaLongValue,int freq) {
 		this.dnaLongValue = dnaLongValue;
 		this.frequency = freq;
-//>>>>>>> dc079353bb964884856517a6ade10a0e96b87534
-	}
 
+	}
+	public void setLongValue(long x){
+		dnaLongValue=x;
+	}
 	public long getLongValue(){
 		return dnaLongValue;
 	}
@@ -32,7 +42,7 @@ public class TreeObject implements Comparable<TreeObject>{
 
 	@Override
 	public String toString() {
-		return "Frequency: " + frequency + ", Sequence: " + dnaLongValue;
+		return dnaLongValue+":"+this.frequency+"$ ";
 	}
 	
 	@Override
@@ -49,4 +59,3 @@ public class TreeObject implements Comparable<TreeObject>{
 		return retVal;
 	}
 }
-

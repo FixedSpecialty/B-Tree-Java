@@ -1,16 +1,14 @@
-import sun.awt.image.ImageWatched;
 
-import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.Scanner;
-import java.util.regex.Pattern;
-
 import static java.lang.Character.isDigit;
 public class FileParse {
     private static boolean neededData;
     public static LinkedList<String> fileParse(int seqLength, File file) throws FileNotFoundException {
+        LinkedList<Character> holdLastFew = new LinkedList<>();
         String str = "";
         LinkedList<String> linky = new LinkedList<>();
         Scanner s = new Scanner(file);
@@ -23,6 +21,7 @@ public class FileParse {
             }
             if(next.contains("//")){
                 neededData = false;
+                holdLastFew.clear();
             }
             if(neededData == true){
                 LinkedList<Character> temp = new LinkedList<>();
@@ -31,12 +30,19 @@ public class FileParse {
                         temp.addLast(next.charAt(i));
                     }
                 }
+                for(int insertPrevLine = 0; insertPrevLine < holdLastFew.size(); insertPrevLine++){
+                    temp.addFirst(holdLastFew.get(insertPrevLine));
+                }
+                holdLastFew.clear();
+                for(int addLastFew = 0; addLastFew < seqLength-1; addLastFew++){
+                    holdLastFew.add(temp.get(temp.size()-addLastFew-1));
+                }
                 for(int i = 0; i <= temp.size()-seqLength; i++){
                     for(int j = i; j < seqLength+i; j++){
-                            str+=temp.get(j);
+                        str+=temp.get(j);
                     }
-                    if(str.contains("N")){
-                        linky.addLast(" ");
+                    if(str.contains("N") || str.contains("n")){
+  //                      linky.addLast(" ");
                         str="";
                     } else {
                         linky.addLast(str);
