@@ -81,6 +81,13 @@ The debug level for GeneBankSearch supports the following.
 In the beginning of the project, we had to decide how to create our nodes and objects. It could have been possible to create our nodes with Linked Lists although we found it easier later into the project to do it with arrays since you could directly call node.n, node.key[i], etc... Another big design that we decided on was our metadata and node design. We settled on having our metadata store a boolean to check if node is a leaf, int to represent the amount of keys, and a long to represent the location of the node. An important piece of information was that we are not storing any metadata for the tree, only metadata for the roots. We decided it was redundant as the root of the tree contains the data of the entire tree.
 ## TESTING:
 Our testing started out with creating a class that instantiated a Btree, created a LinkedList to reprent the parsed file and then looped through the linked list, adding the sequenced into the btree. We then created a print method that would display all of the DNA strings and the frequencies of each string.
+Run speeds when using a cache/ no cache:
+    No cache (in milliseconds) = 526401
+    Cache of size 100 (in milliseconds) = 278939
+        A 247462 millisecond improvement.
+    Cache of size 500 (in milliseconds) = 253550
+        A 272851 millisecond improvement.
+All of these tests were ran for "test3.gbk" with a sequence length of 6 and the optimal degree. From these run times it is evident that the cache is a useful tool that can almost cut the runtime in half. Note: The 100 and the 500 size caches did not show that large of a difference because there was just over 100 nodes so the size 100 cache could almost hold all of the nodes.
 ## DISCUSSION:
 ## EXTRA CREDIT: N / A
  
