@@ -88,7 +88,6 @@ public class GeneBankSearch {
 	                               
 	                            }
 							System.out.println(DataConversion.convertFromLong(x, sequence)+": "+foundQuery.keys[i].getFrequency());
-							break;
 						}
 						
 					}
