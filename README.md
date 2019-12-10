@@ -82,7 +82,7 @@ In the beginning of the project, we had to decide how to create our nodes and ob
 ## TESTING:
 Our testing started out with creating a class that instantiated a Btree, created a LinkedList to reprent the parsed file and then looped through the linked list, adding the sequenced into the btree. We then created a print method that would display all of the DNA strings and the frequencies of each string.
 
-Run speeds when using a cache/ no cache:
+Run speeds when using a cache/ no cache when creating the BTree:
 
     No cache (in milliseconds) = 526401
     
@@ -93,6 +93,17 @@ Run speeds when using a cache/ no cache:
         A 272851 millisecond improvement.
         
 All of these tests were ran for "test3.gbk" with a sequence length of 6 and the optimal degree. From these run times it is evident that the cache is a useful tool that can almost cut the runtime in half. Note: The 100 and the 500 size caches did not show that large of a difference because there was just over 100 nodes so the size 100 cache could almost hold all of the nodes.
+
+Run speeds when using a cache/ no cache when using the the search driver:
+
+    No cache (in milliseconds) = 41310
+    
+    Cache of size 100 (in milliseconds) = 40276
+        A 1034 millisecond improvement.
+        
+    Cache of size 500 (in milliseconds) = 38414
+        A 2896 millisecond improvement. 
+        
 ## DISCUSSION:
 ## EXTRA CREDIT: N / A
  
