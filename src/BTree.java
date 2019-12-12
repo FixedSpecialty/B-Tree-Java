@@ -2,11 +2,9 @@
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.LinkedList;
 
 public class BTree {
 	//we need to create instructor with the max degree
@@ -237,7 +235,7 @@ public class BTree {
 				}
 				qfile.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+			
 				e.printStackTrace();
 			}
 			return node;
@@ -272,7 +270,7 @@ public class BTree {
 				x= newfile.length();
 				newfile.close();
 			}catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 			return x;
