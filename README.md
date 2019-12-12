@@ -96,13 +96,13 @@ All of these tests were ran for "test3.gbk" with a sequence length of 6 and the 
 
 Run speeds when using a cache/ no cache when using the the search driver:
 
-    No cache (in milliseconds) = 41310
+    No cache (in milliseconds) = 240974
     
-    Cache of size 100 (in milliseconds) = 40276
-        A 1034 millisecond improvement.
+    Cache of size 100 (in milliseconds) = 2654
+        A 238320 millisecond improvement.
         
-    Cache of size 500 (in milliseconds) = 38414
-        A 2896 millisecond improvement. 
+    Cache of size 500 (in milliseconds) = 2571
+        A 238403 millisecond improvement. 
         
 ## DISCUSSION:
 ## EXTRA CREDIT: N / A

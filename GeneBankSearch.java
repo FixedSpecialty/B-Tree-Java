@@ -45,22 +45,39 @@ public class GeneBankSearch {
         //args 2 check
         queryFile = args[2];
 
-        //args 3 check
-        if(args.length > 3 && args.length == 5)
-        {
-            cacheSize = Integer.parseInt(args[3]);
-            actualCache = new Cache(cacheSize);
-        }
-        //args 4 check
-        if(args.length == 5 )
-		{
-			debugLevel = Integer.parseInt(args[4]);
-			if(debugLevel > 1 || debugLevel < 0)
-			{
-				System.out.println("Incorrect debug level. Must be 0 for NO, 1 for YES");
+			//args 3 check
+			if(args.length == 4){
+				if(cacheBool == true) {
+					cacheSize = Integer.parseInt(args[3]);
+					if (cacheBool == false) {
+						actualCache = new Cache(0);
+					} else if (cacheBool == true) {
+						actualCache = new Cache(cacheSize);
+					}
+				} else {
+					debugLevel = Integer.parseInt(args[3]);
+					if(debugLevel > 1 || debugLevel < 0)
+					{
+						System.out.println("Incorrect debug level. Must be 0 for NO, 1 for YES");
+					}
+				}
 			}
-        }
-        
+			//args 3 & 4 check
+			if(args.length == 5 )
+			{
+				debugLevel = Integer.parseInt(args[4]);
+				if(debugLevel > 1 || debugLevel < 0)
+				{
+					System.out.println("Incorrect debug level. Must be 0 for NO, 1 for YES");
+				}
+				cacheSize = Integer.parseInt(args[3]);
+				if(cacheBool == false){
+					actualCache = new Cache(0);
+				}
+				else if(cacheBool == true){
+					actualCache = new Cache(cacheSize);
+				}
+			}
         DataConversion data = new DataConversion();
         String[] parts = treeFile.split("\\.");
        // File filefile = new File(treeFile.substring(0, args[1].indexOf(".btree")));
@@ -70,6 +87,9 @@ public class GeneBankSearch {
 		//BTree bTree = new BTree(treeFile, sequence, degree, cacheBool, cacheSize, debugLevel);
 		Scanner queryScan = new Scanner(new File(queryFile));
 		TreeNode root = Read(0);
+		if(cacheBool == true) {
+			actualCache.addObject(root);
+		}
 	    StringBuilder str = new StringBuilder();
         String printname = new String(parts[0]+"_"+queryFile+"_"+"result");
 			while(queryScan.hasNext()){
@@ -83,6 +103,9 @@ public class GeneBankSearch {
 				{
 					for(int i=0;i<foundQuery.keys.length;i++) {
 						if(x==foundQuery.keys[i].getLongValue()) {
+							if(cacheBool == true) {
+								actualCache.addObject(foundQuery);
+							}
 	                    if(debugLevel == 1){
 	                                str.append(DataConversion.convertFromLong(x, sequence)+": "+foundQuery.keys[i].getFrequency()+"\n");
 	                               
@@ -114,6 +137,14 @@ public class GeneBankSearch {
     
 	private static TreeNode Read(long location) {
 		TreeNode node=new TreeNode(degree,location);
+		if(cacheBool == true) {
+			for (int i = 0; i < actualCache.numberOfObject(); i++) {
+				TreeNode n = (TreeNode) actualCache.get(i);
+				if (location == n.ownLocation) {
+					return n;
+				}
+			}
+		}
 		try {
 			RandomAccessFile qfile=new RandomAccessFile(new File(treeFile),"rwd");
 			qfile.seek(location);
@@ -144,6 +175,9 @@ public class GeneBankSearch {
 			i++;
 		}
 		if (i<node.n && key == node.keys[i].getLongValue()) {
+			if(cacheBool == true) {
+				actualCache.addObject(node);
+			}
 			return node;
 		}
 		if(node.leaf) {
