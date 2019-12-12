@@ -13,6 +13,9 @@ public class Cache<T> {
         cache = new LinkedList<>();
     }
 
+    public int numberOfObject(){
+        return cache.size();
+    }
     //return the first object
     public T getObject(){
         T target = cache.getFirst();
@@ -26,24 +29,24 @@ public class Cache<T> {
     //checks the limit and if the cache already contains the object
     //will remove the object if it is already in the cache
     public void addObject(T bTreeObject){
-        if(limit == 0)
+        if(limit <= 0)
             return;
-            //if the cache is at maximum size
-            if (cache.size() == limit) {
-                //check if object is already in cache, if so move to top
-                if (cache.contains(bTreeObject)) {
-                    cache.remove(bTreeObject);
-                } else {
-                    cache.removeLast();
-                }
-                cache.addFirst(bTreeObject);
-            } else { //if there is room in the cache
-                //check if object is already in cache, if so move to top
-                if (cache.contains(bTreeObject)) {
-                    cache.remove(bTreeObject);
-                }
-                cache.addFirst(bTreeObject);
+        //if the cache is at maximum size
+        if (cache.size() == limit) {
+            //check if object is already in cache, if so move to top
+            if (cache.contains(bTreeObject)) {
+                cache.remove(bTreeObject);
+            } else {
+                cache.removeLast();
             }
+            cache.addFirst(bTreeObject);
+        } else { //if there is room in the cache
+            //check if object is already in cache, if so move to top
+            if (cache.contains(bTreeObject)) {
+                cache.remove(bTreeObject);
+            }
+            cache.addFirst(bTreeObject);
+        }
     }
 
     //@Param T
