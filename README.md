@@ -104,6 +104,5 @@ Run speeds when using a cache/ no cache when using the the search driver:
     Cache of size 500 (in milliseconds) = 2571
         A 238403 millisecond improvement. 
         
-## DISCUSSION:
 ## EXTRA CREDIT: N / A
  
